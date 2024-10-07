@@ -1,5 +1,9 @@
+import numpy as np
+from obspy import read
+from scipy.integrate import simps
+from obspy.signal.trigger import classic_sta_lta, trigger_onset
 
-def primer_algo(mseed_file1):
+def arrival_time_predictor(mseed_file1):
     
     ## Reading the .mseed file
     st = read(mseed_file1)
