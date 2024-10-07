@@ -1,7 +1,9 @@
 def primer_algo(mseed_file1):
+
+    ## Reading the .mseed file
     st = read(mseed_file1)
 
-    ## This is how you get the data and the time, which is in seconds
+    ## Getting the data and the time
     tr = st.traces[0].copy()
     tr_times = tr.times()
     tr_data = tr.data
@@ -18,59 +20,45 @@ def primer_algo(mseed_file1):
     tr_times_filt = tr_filt.times()
     tr_data_filt = tr_filt.data
     
-    mask = np.abs(tr_data_filt)>np.median(np.abs(tr_data_filt))
-    #tr_times_filt = tr_times_filt[mask]
-    #tr_data_filt = np.abs(tr_data_filt[mask])
     tr_data_filt = np.abs(tr_data_filt) - np.median(np.abs(tr_data_filt))
-    ## Create LTA algoritm
-    # Sampling frequency of our trace
-    df = tr.stats.sampling_rate
-
-    window_size = 1001
- 
-    i = 0
-    # Initialize an empty list to store moving averages
-    moving_averages = []
-
-     
-    # Loop through the array to consider
-    # every window of size 3
-    #moving_averages = np.convolve(tr_data_filt, np.ones(window_size) / window_size, mode='valid')
-
-    #time_lost = window_size//2
-    #tr_times_filt = tr_times_filt[time_lost:-1*time_lost]
-    #tr_data_filt = moving_averages
     
-    # How long should the short-term and long-term window be, in seconds?
+    ## Create STA/LTA algoritm
+    # Sampling frequency of our trace
+    df = tr_filt.stats.sampling_rate
+    
+    #Setting the short-term and long-term windows
     sta_len = 100
     lta_len = 2700
     
     # Run Obspy's STA/LTA to obtain a characteristic function
-    # This function basically calculates the ratio of amplitude between the short-term 
-    # and long-term windows, moving consecutively in time across the data
     cft = classic_sta_lta(tr_data_filt, int(sta_len * df), int(lta_len * df))
     
-    ## Haciendo el corte
-    # Play around with the on and off triggers, based on values in the characteristic function
-    thr_on = 2.75 #2.75
-    thr_off = 1.5 #1.
-    on_off = np.array(trigger_onset(cft, thr_on, thr_off))
+    # Setting the on and off triggers, based on values in the characteristic function
+    thr_on = 2.7
+    thr_off = 1.5 
     # The first column contains the indices where the trigger is turned "on". 
     # The second column contains the indices where the trigger is turned "off".
+    on_off = np.array(trigger_onset(cft, thr_on, thr_off))
 
-    results = []
-    areas = []
+    ## Initilizating list to save the time_ons and the area below the curve between
+    ## the on and off signals
+    times_areas = []
     for i in np.arange(0,len(on_off)):
         triggers = on_off[i]
-        if abs(triggers[0]-triggers[1]) > 3000:
-            results.append(tr_times_filt[triggers[0]])      
-    areas.append([tr_times_filt[triggers[0]],simps(tr_data_filt[triggers[0]:triggers[1]+1],tr_times_filt[triggers[0]:triggers[1]+1])])
-    
-    if len(areas) == 0:s
-        return []
-    areas = np.asarray(areas)
-    max_area = np.max(areas[:,1])
+        # We are just keeping the triggers that have more that 3000 data points between
+        # on and off, to further avoid catching a spike
+        if abs(triggers[0]-triggers[1]) > 3000:      
+            times_areas.append([tr_times_filt[triggers[0]],simps(tr_data_filt[triggers[0]:triggers[1]+1],tr_times_filt[triggers[0]:triggers[1]+1])])
 
-    survive_area = areas[areas[:,1] >= 2.5*10**-7]
+    ## If there's a dataset without saved triggers, just return an empty list
+    if len(times_areas) == 0:
+        return []
+
+    ## Setting a lower limit to the integral values
+    area_test = 2.5*10**-7
+
+    ## Only keeping the arrival times which integrals pass this threshold 
+    times_areas = np.asarray(times_areas)
+    survive_time_area = times_areas[times_areas[:,1] >= area_test]
     
-    return list(survive_area[:,0])
+    return list(survive_time_area[:,0])
