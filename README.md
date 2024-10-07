@@ -2,6 +2,8 @@
 
 This project aims to detect seismic events in lunar seismic data by applying the Short-Term Average / Long-Term Average (STA/LTA) algorithm and other signal processing techniques. The goal is to predict the start times of seismic events and output the results in a structured format.
 
+https://www.spaceappschallenge.org/nasa-space-apps-2024/find-a-team/maphiaquantica/
+
 ## Project Overview
 
 Planetary seismology is fundamentally constrained by the limited availability of data, primarily due to difficulties in transmitting high-resolution seismic signals back to Earth. This project seeks to overcome these challenges by performing on-site analysis using pre-existing datasets from lunar missions. The solution aims to differentiate seismic events from noise and determine the arrival times of these events.
