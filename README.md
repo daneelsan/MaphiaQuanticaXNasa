@@ -24,11 +24,11 @@ project-directory/
 │                   └── *.mseed  # Input seismic data files
 │
 ├── notebooks/
-│   └── run_final_algorithm.ipynb    # Jupyter notebook running the arrival_time_predictor algorithm
-│   └──arrival_times_results.csv    # Output file containing detection results
+│   └── run_final_algorithm.ipynb                     # Jupyter notebook running the arrival_time_predictor algorithm
+│   └── lunar_test_data_S15_GradeA_predictions.csv    # Output file containing detection results
 ├── signal_processing_algorithms
-│   └── final_algorithm.ipynb        # Python code with the arrival_time_predictor implementation
-├── README.md                    # This README file
+│   └── final_algorithm_mofidfied.ipynb               # Python code with the arrival_time_predictor implementation
+├── README.md                                         # This README file
 ```
 
 ## How to Use
@@ -50,21 +50,23 @@ project-directory/
 
 2. **Batch Processing All Files**
 
-   The `run_final_algorithm.ipynb` notebook processes all `.mseed` files within a specified directory (`./data/lunar/training/data/S15_GradeA`) and writes the output to a CSV file (`arrival_times_results.csv`).
+   The `run_final_algorithm.ipynb` notebook processes all `.mseed` files within a specified directory (`./data/lunar/training/data/S15_GradeA`) and writes the output to a CSV file (`lunar_test_data_S15_GradeA_predictions.csv`).
 
 ### Output
 
-The output CSV file (`arrival_times_results.csv`) will contain the following columns:
+The output CSV file (`lunar_test_data_S15_GradeA_predictions.csv`) will contain the following columns:
 
 - `filename`: The name of the processed `.mseed` file.
-- `detection_times_rel(sec)`: A list of predicted detection times relative to the start of the file (in seconds).
-- `detection_times(%Y-%m-%dT%H:%M:%S.%f)`: A list of predicted detection times in human-readable format.
+- `time_rel(sec)`: A list of predicted detection times relative to the start of the file (in seconds).
+- `time_abs(%Y-%m-%dT%H:%M:%S.%f)`: A list of predicted detection times in human-readable format.
 
 Example output:
 
 ```
-filename,detection_times_rel(sec),detection_times(%Y-%m-%dT%H:%M:%S.%f)
-xa.s12.00.mhz.1970-01-19HR00_evid00002,73450.41509433962,1970-01-19T20:24:11.080094
+filename,time_abs(%Y-%m-%dT%H:%M:%S.%f),time_rel(sec)
+xa.s15.00.mhz.1973-10-27HR00_evid00134,1973-10-27T11:14:09.006830,40448.45283018868
+xa.s15.00.mhz.1975-06-22HR00_evid00194,1975-06-22T19:55:02.717566,71702.49056603774
+xa.s15.00.mhz.1974-11-17HR00_evid00162,1974-11-17T19:54:58.833981,71698.71698113208
 ...
 ```
 
